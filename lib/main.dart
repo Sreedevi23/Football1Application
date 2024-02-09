@@ -1,62 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:soccer_tutorial/api_manager.dart';
+import 'package:soccer_tutorial/pagerbody.dart';
 
 void main() {
-  runApp(FootballScoreApp());
+  runApp(MyApp());
 }
 
-class FootballScoreApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Football Score App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: FootballScoreHomePage(),
+      debugShowCheckedModeBanner: false,
+      home: SoccerApp(),
     );
   }
 }
 
-class FootballScoreHomePage extends StatelessWidget {
-  final List<Match> matches = [
-    Match(team1: 'Team A', team2: 'Team B', score1: 3, score2: 2),
-    Match(team1: 'Team C', team2: 'Team D', score1: 1, score2: 1),
-    Match(team1: 'Team E', team2: 'Team F', score1: 2, score2: 4),
-    // Add more matches as needed
-  ];
+class SoccerApp extends StatefulWidget {
+  @override
+  _SoccerAppState createState() => _SoccerAppState();
+}
 
+class _SoccerAppState extends State<SoccerApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFFAFAFA),
       appBar: AppBar(
-        title: Text('Football Score App'),
+        backgroundColor: Color(0xFFFAFAFA),
+        elevation: 0.0,
+        title: Text(
+          "SOCCERBOARD",
+          style: TextStyle(color: Colors.black),
+        ),
+        centerTitle: true,
       ),
-      body: ListView.builder(
-        itemCount: matches.length,
-        itemBuilder: (context, index) {
-          final match = matches[index];
-          return ListTile(
-            title: Text('${match.team1} vs ${match.team2}'),
-            subtitle: Text('${match.score1} - ${match.score2}'),
-            onTap: () {
-              // Handle tapping on a match to view match details
-              // You can navigate to a new screen or show a dialog with match details
-              // For simplicity, we'll just print match details to the console
-              print('Match Details:\n${match.team1} ${match.score1} - ${match.score2} ${match.team2}');
-            },
-          );
-        },
+      //now we have finished the api service let's call it
+      //Now befo re we create Our layout let's create our API service
+      body: FutureBuilder(
+        future: SoccerApi()
+            .getAllMatches(), //Here we will call our getData() method,
+        builder: (context, snapshot) {
+          //the future builder is very intersting to use when you work with api
+          if (snapshot.hasData) {
+            print((snapshot.data).length);
+            return PageBody(snapshot.data);
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        }, // here we will buil the app layout
       ),
     );
   }
 }
-
-class Match {
-  final String team1;
-  final String team2;
-  final int score1;
-  final int score2;
-
-  Match({required this.team1, required this.team2, required this.score1, required this.score2});
-}
+//So as we can see w got our matches data,
+// the data size depend on the date and the time so
+// you can get as many data as many matches are curetly playing
+//Now let's try to get data by seasons and leagues
